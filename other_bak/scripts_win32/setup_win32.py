@@ -92,6 +92,8 @@ warfile = zipfile.ZipFile(mainfolder+'/czjpcoms.war')
 warfile.extractall(mainfolder+'/tomcat7_win32/webapps/czjpcoms')
 warfile.close()
 logging.info('End uncompress .war file:')
+os.remove(mainfolder+'/czjpcoms.war')
+
 
 #替换tomcat_install.bat其中路径
 path_tomcatbat_install =  currentdir + '/tomcat_install_win32.bat'
