@@ -1,19 +1,9 @@
 # -*- coding:utf-8 -*-
-import os,sys,logging,re,string,zipfile,shutil
+import os,sys,logging,re,string,zipfile,shutil,subprocess
 #mysql_win32安装
 #替换my.ini其中的绝对路径
 
-#日志设定
-logging.basicConfig(level=logging.INFO,
-                        format='[%(asctime)s]%(filename)s[line:%(lineno)d][%(levelname)s] %(message)s ',                        
-                        datefmt='%Y-%m-%d %H:%M:%S',
-                        filename='../log/install.log',
-                        filemode='a')
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s]%(filename)s[line:%(lineno)d][%(levelname)s] %(message)s ')
-console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
+
 
 def getCurrentDirPath():
     #获取当前脚本路径
@@ -58,10 +48,27 @@ def executeScript(scriptpath):
             logging.info(line)
     r1.close()
     logging.info('finished install service')
-    
-    
+
+
 currentdir = getCurrentDirPath()
+print("CURRENT SCRIPT POSITION: "+currentdir)
+print("CHANGE DIR")
+os.chdir(currentdir)
 mainfolder = os.path.abspath(os.path.join(currentdir,'..'))  #当前目录scripts
+
+#日志设定
+logging.basicConfig(level=logging.INFO,
+                        format='[%(asctime)s]%(filename)s[line:%(lineno)d][%(levelname)s] %(message)s ',                        
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        filename='../log/install.log',
+                        filemode='a')
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('[%(levelname)s] %(message)s ')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)   
+    
+
 logging.info('=========================[Installation Start:]============================')
 logging.info('current dir:'+currentdir)
 logging.info('main dir:'+mainfolder)
@@ -120,6 +127,7 @@ createNewScript(path_prop_bak,path_prop,'<setupdir>',mainfolder)
 executeScript( os.path.join( currentdir,'./tomcat_install_win32.bat'))
 
 logging.info('=========================[Installation End.]============================')
+a = input("Press anykey to finish...")
 
 
 
