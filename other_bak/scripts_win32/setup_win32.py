@@ -60,7 +60,7 @@ mainfolder = os.path.abspath(os.path.join(currentdir,'..'))  #当前目录script
 logging.basicConfig(level=logging.INFO,
                         format='[%(asctime)s]%(filename)s[line:%(lineno)d][%(levelname)s] %(message)s ',                        
                         datefmt='%Y-%m-%d %H:%M:%S',
-                        filename='../log/install.log',
+                        filename= os.path.join( mainfolder, './log/install.log'),
                         filemode='a')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
