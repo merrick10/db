@@ -58,21 +58,26 @@ logging.info("===========[UPDATE START]================")
 
 #停止服务
 logging.info('Stop service...')
-t1 = win32serviceutil.QueryServiceStatus('tomcat7')
-m2 = win32serviceutil.QueryServiceStatus('mysql5.6')
-if(t1[1] == win32service.SERVICE_RUNNING):
-    win32serviceutil.StopService('tomcat7')
-if(m2[1] == win32service.SERVICE_RUNNING):
-    win32serviceutil.StopService('mysql5.6')
-win32serviceutil.WaitForServiceStatus('tomcat7',win32service.SERVICE_STOPPED,30)
-win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_STOPPED,30)
-logging.info('Done.')
+try:
+    t1 = win32serviceutil.QueryServiceStatus('tomcat7')
+    m2 = win32serviceutil.QueryServiceStatus('mysql5.6')
+    if(t1[1] == win32service.SERVICE_RUNNING):
+        win32serviceutil.StopService('tomcat7')
+    if(m2[1] == win32service.SERVICE_RUNNING):
+        win32serviceutil.StopService('mysql5.6')
+    win32serviceutil.WaitForServiceStatus('tomcat7',win32service.SERVICE_STOPPED,30)
+    win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_STOPPED,30)
+    logging.info('Done.')
+except Exception as err:
+    logging.warn('Service status abnormal: '+ str(err))
+
+#应该先判断.war包是否存在，不存在则不删除、不解压、不替换
                                       
 #删除当前旧wepapp下的app目录
 logging.info('Clear the old scripts folder... ')
 emptyFolderOrFile(appfolder)
 logging.info('Done. ')
-#解压新war包,在当前目录的新临时目录_tmp
+#解压新war包,在当前目录的新临时目录_tmp，即以"_tmp"为文件夹名打包.war文件和.sql文件
 logging.info('Extract new warfile...')
 path_newwar = os.path.join(curdir,'_tmp','czjpcoms.war')
 newwarfile = zipfile.ZipFile(path_newwar)
@@ -102,6 +107,30 @@ win32serviceutil.StartService('tomcat7')
 win32serviceutil.WaitForServiceStatus('tomcat7',win32service.SERVICE_RUNNING,30)
 win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_RUNNING,30)
 logging.info('Done.')
+
+#如果有sql文件还将执行导入sql文件
+sqlfilefolder = os.path.join(curdir,'_tmp')
+objs = os.listdir(sqlfilefolder)
+for filename in objs:
+    if os.path.isfile and filename.endswith('.sql'):        
+        batcmd = curdir + r'/mysql_win32/bin/mysql.exe -uroot -pokisoft jpcorps<'+ os.path.join(curdir,r'_tmp',filename )
+        logging.info('START SQL commit: '+ filename)
+        logging.info('START SQL commit: '+ batcmd)
+        try:
+            r1 = os.popen(batcmd)
+            info = r1.readlines()  
+            for line in info:  
+                line = line.strip('\r\n')
+                logging.info(line)
+            r1.close()
+        except Exception as err:
+                logging.warn('SQL execute occur: '+ str(err))
+                break
+        logging.info('Done.')
+
+
+
+
 logging.info("===========[UPDATE FINISHED]================")
 a = input("Press anykey to finish...")
 
