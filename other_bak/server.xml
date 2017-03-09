@@ -124,8 +124,8 @@
 
       <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="true">
-			<Context path="" docBase="/czjpcoms" />
-			<Context path="/czjpcoms" docBase="/czjpcoms" />
+			<Context path="" docBase="/czjpcoms"  sessionCookieName="czjpcomssessionname1"/>
+			<Context path="/czjpcoms" docBase="/czjpcoms" sessionCookieName="czjpcomssessionname2"/>
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
         <!--
