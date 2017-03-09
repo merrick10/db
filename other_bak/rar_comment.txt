@@ -1,0 +1,9 @@
+;The comment below contains SFX script commands
+
+Setup=czjpcoms_all\scripts_win32\setup_win32.exe
+Silent=2
+Title=CZJPCOMS
+Text
+{
+PLEASE WAITING...
+}

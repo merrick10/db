@@ -1,0 +1,10 @@
+[目标：]
+编译打包web项目
+[前提：]
+有jdk和ant程序；
+JAVA_HOME环境变量有效；
+ANT_HOME环境变量有效；
+[执行ANT的build脚本:]
+1，CMD环境切换至ant的build脚本目录
+2，指定脚本文件(参数-f)执行：ant -f buildczjpcoms.xml
+
