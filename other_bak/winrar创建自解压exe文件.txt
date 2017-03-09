@@ -1,0 +1,31 @@
+"C:\Program Files\WinRAR\WinRAR.exe"
+
+
+SRC:
+D:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_all\*
+
+DST:
+D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe
+
+
+
+在【D:\ex_setup\setup_czjpcoms_windows\tmp】目录下执行
+"C:\Program Files\WinRAR\rar.exe" a  -r  -sfx -zD:\ex_setup\setup_czjpcoms_windows\rar_comment.txt D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe czjpcoms_all\*
+
+
+rar  c -z"D:\ex_setup\setup_czjpcoms_windows\sfx_rar\rar_comment.txt" D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe
+
+
+
+************************************************************
+
+
+;The comment below contains SFX script commands
+
+Setup=czjpcoms_all\scripts_win32\setup_win32.exe
+Silent=2
+Title=CZJPCOMS
+Text
+{
+PLEASE WAITING...
+}

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================                                                               
+     ====================================================================== -->
+<project name="czjpcoms" default="default1" basedir="D:/GitRp3/learning">
+    <description>
+            Web Project built with JDK7 and run on Tomcat7
+    </description>
+	<!-- log -->
+	<record action="start" append="no" loglevel="info" name="D:/ex_setup/tmp/czjpcomsbuildlog.log"/>
+	<tstamp> 
+		    <format property="DSTAMP" pattern="yyyyMMdd" locale="zh"/> 
+		    <format property="TSTAMP" pattern="HHmmss" locale="zh"/> 
+	</tstamp> 
+	
+	<!-- temporary folder -->
+	<property name="tmpdir" value="D:/ex_setup/tmp/tmp_${DSTAMP}_${TSTAMP}/" ></property>
+	<!--setup collection folder -->
+	<property name="setupcollectionfolder" value="D:/ex_setup/setup_czjpcoms_windows/" ></property>
+	<property name="packfolder_win32" value="D:/ex_setup/setup_czjpcoms_windows/win32/" ></property>
+	<property name="tmp_czjpcoms_all_win32" value="D:/ex_setup/setup_czjpcoms_windows/tmp/czjpcoms_all/" ></property>
+	
+	<!-- webapp source -->
+	<property name="webprj.base" value="${basedir}/czjpcoms/"></property>
+	
+	<property name="webprj.src" value="${webprj.base}/src/"></property>
+	<property name="webprj.root" value="${webprj.base}/WebContent/"></property>
+	<property name="webprj.lib" value="${webprj.root}/WEB-INF/lib/"></property>		
+	
+	<!-- dest warfile -->
+	<property name="appname" value="${ant.project.name}"></property>
+	<property name="warfile" value="${tmpdir}/${appname}.war"></property>	
+	
+	<!--output  files folder -->
+	<property name="webprj.destfolder" value="${tmpdir}/${appname}/"></property>
+	<property name="webprj.destclasses" value="${webprj.destfolder}/WEB-INF/classes/"></property>
+	
+	<!-- tomcat 实际路径-->
+	<property name="tomcat.home" value="F:/software/develop/apache-tomcat-7.0.68/"></property>
+	<property name="tomcat.lib" value="${tomcat.home}/lib/"></property>
+	<property name="tomcat.webappfoler" value="${tomcat.home}/webapps/"></property>
+
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default1" depends="cpwar" description="description">        
+    </target>
+  
+	
+	<!-- Delete old *.class folder and .war file and tmp prj folder -->
+	<target name="delclasses">	
+		<delete dir="${webprj.destclasses}"></delete>
+		<delete dir="${webprj.destfolder}"></delete>
+		<delete file="${warfile}"></delete>
+	</target>
+	
+	<!-- Create classes dir -->
+	<target name="md" >
+		<mkdir dir="${webprj.destclasses}"/>
+	</target>
+	
+	
+	<!-- 需要引用的jar包 -->
+	<path id="classpathset">
+		<fileset dir="${webprj.lib}">
+			<include name="*.jar"/>
+		</fileset>		
+		<fileset dir="${tomcat.lib}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<property name="classpath" refid="classpathset"></property>
+	
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: buildjava,编译                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="buildjava">
+            <javac   verbose="yes" listfiles="yes" 
+            	classpath="${classpath}"
+            	srcdir="${webprj.src}" 
+            	destdir="${webprj.destclasses}" 
+            	fork="java$$javac.exe"
+            	source="1.7"
+            	target="1.7"
+            	encoding="utf-8" 
+            	debug="on" 
+            	deprecation="on"
+            	>
+            	<compilerarg value="-Xlint"/>
+            </javac>
+    </target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: cp,复制其他一些非java文件                
+         - - - - - - - - - - - - - - - - - -->
+    <target name="cp">
+            <copy todir="${webprj.destclasses}">
+            	<fileset dir="${webprj.src}">
+            		<exclude name="**/*.java"/>
+            	</fileset>
+            </copy>
+    		<copy todir="${webprj.destfolder}">
+    	            	<fileset dir="${webprj.root}">
+    	            		<exclude name="**/*.java"/>
+    	            	</fileset>
+            </copy>
+    </target>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: createwarfile                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="createwarfile" depends="delclasses,md,cp,buildjava">
+            <war destfile="${warfile}" webxml="${webprj.root}/WEB-INF/web.xml">
+            	<fileset dir="${webprj.root}">
+            		<include name="**"/>
+            	</fileset>
+            	<classes dir="${webprj.destclasses}"></classes>
+            </war>
+    </target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: cpwar                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="cpwar" depends="createwarfile">
+            <copy todir="${tomcat.webappfoler}" file="${warfile}" overwrite="yes"></copy>    	
+    		<copy todir="${setupcollectionfolder}" file="${warfile}" overwrite="yes"></copy>
+    		<copy todir="${packfolder_win32}" file="${warfile}" overwrite="yes"></copy>    	
+    		<copy todir="${tmp_czjpcoms_all_win32}" file="${warfile}" overwrite="yes"></copy>
+    </target>
+	
+	
+	
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: startuptomcat, 执行外部命令,
+          如果exec中没有dir属性设置，那么tomcat不启动成功，报CATALINA_HOME没设置               
+     “此target仅用于验证，实际作war包时可省略”    - - - - - - - - - - - - - - - - - -->	
+	
+    <target name="startuptomcat" depends="cpwar">
+		<exec executable="cmd.exe" dir="${tomcat.home}">
+			<arg line="/c ${tomcat.home}/bin/startup.bat"/>
+		</exec>            
+	</target>	
+	
+
+	<!-- webapp输出完成;后续在python中需要完成，安装包脚本内容： 
+		1：复制 tomcat(绿色版，经安全加固)到指定目录；
+		2：解压 czjpcoms.war至tomcat的“${tomcat.home}/webapps/”目录；
+		3：复制mysql数据库(绿色版，经安全加固，已经建库，已经建立用户)到指定目录；
+		4：安装tomcat为系统服务；
+		5：安装mysql为系统服务；
+		6：启动mysql；
+		7：启动tomcat；
+		
+		另需要：
+		1，重启服务的脚本；
+		2，停止服务的脚本；
+		3，删除服务的脚本；
+		另需要：
+		1，升级补丁脚本；
+		2，数据库备份脚本；
+		3，数据库恢复脚本；
+	-->
+
+	
+</project>
+
+
