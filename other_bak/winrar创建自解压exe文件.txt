@@ -10,13 +10,13 @@ D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe
 
 
 在【D:\ex_setup\setup_czjpcoms_windows\tmp】目录下执行
-"C:\Program Files\WinRAR\rar.exe" a  -r  -sfx -zD:\ex_setup\setup_czjpcoms_windows\rar_comment.txt D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe czjpcoms_all\*
-
-
-rar  c -z"D:\ex_setup\setup_czjpcoms_windows\sfx_rar\rar_comment.txt" D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe
+"C:\Program Files\WinRAR\rar.exe" a  -r  -sfx -iiconD:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_all\bfp.ico -zD:\ex_setup\setup_czjpcoms_windows\rar_comment.txt D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_timestamp.exe czjpcoms_all\*
 
 
 
+
+完整命令：
+start cmd /k "cd /d D:\ex_setup\setup_czjpcoms_windows\tmp && echo Now creating... && "C:\Program Files\WinRAR\rar.exe" a -r -sfx  -iiconD:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_all\bfp.ico  -zD:\ex_setup\setup_czjpcoms_windows\rar_comment.txt D:\ex_setup\setup_czjpcoms_windows\sfx_rar\setup_czjpcoms_win32_20170310_092919.exe czjpcoms_all\* && exit" 
 ************************************************************
 
 
