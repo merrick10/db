@@ -5,6 +5,11 @@ net start mysql5.6
 IF  %ERRORLEVEL% NEQ 0 GOTO service_fail
 @echo success
 sc config mysql5.6 start= auto
+
+@echo execute init db sql
+
+
+
 GOTO end
 :service_fail
 @echo failed

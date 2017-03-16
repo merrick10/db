@@ -123,6 +123,13 @@ if(not os.path.exists(os.path.join(mainfolder,'./emailattachfolder'))):
 logging.info('make dir:'+mainfolder+'/compicturefolder')
 if(not os.path.exists(os.path.join(mainfolder,'./compicturefolder'))):
     os.mkdir(mainfolder+'/compicturefolder')
+
+#articlepicfolder
+logging.info('make dir:'+mainfolder+'/articlepicfolder')
+if(not os.path.exists(os.path.join(mainfolder,'./articlepicfolder'))):
+    os.mkdir(mainfolder+'/articlepicfolder')
+
+
 createNewScript(path_prop_bak,path_prop,'<setupdir>',mainfolder)
 
 #执行tomcat服务安装

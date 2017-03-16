@@ -5,6 +5,10 @@ net start mysql5.6
 IF  %ERRORLEVEL% NEQ 0 GOTO service_fail
 @echo success
 sc config mysql5.6 start= auto
+
+%mysqlpath%bin/mysql.exe -uroot -pokisoft <<setupdir>/scripts_win32/jpcorps_1_win32.sql
+
+
 GOTO end
 :service_fail
 @echo failed
