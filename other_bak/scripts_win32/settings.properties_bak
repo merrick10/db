@@ -1,3 +1,4 @@
 emailattachsavefolder=<setupdir>/emailattachfolder
 vipcompicfolder=<setupdir>/compicturefolder
-articlepicfolder=D:/ex/
+articlepicfolder=<setupdir>/articlepicfolder
+mbfolder=<setupdir>/mbfolder

@@ -106,7 +106,7 @@ path_servicebat_bak = currentdir + '/service.bat_bak'
 createNewScript(path_servicebat_bak, path_servicebat,'<setupdir>',mainfolder)
 
 #替换wepapp日志路径
-#${tomcatwebapps}/czjpcoms/WEB-INFclasses/log4jex.xml
+#${tomcatwebapps}/czjpcoms/WEB-INF/classes/log4jex.xml
 path_log4j = mainfolder + '/tomcat7_win32/webapps/czjpcoms/WEB-INF/classes/log4jex.xml'
 path_log4jex_bak = currentdir + '/log4jex.xml_bak'
 createNewScript(path_log4jex_bak, path_log4j, 'E:/log_czjpcoms/log.log', mainfolder + '/log/log.log')
@@ -115,21 +115,27 @@ createNewScript(path_log4jex_bak, path_log4j, 'E:/log_czjpcoms/log.log', mainfol
 #${tomcatwebapps}/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties
 path_prop_bak = currentdir + '/settings.properties_bak'
 path_prop = mainfolder + '/tomcat7_win32/webapps/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties'
+
 #建立文件夹${setupdir}/emailattachfolder
-#建立文件夹${setupdir}/compicturefolder
 logging.info('make dir:'+mainfolder+'/emailattachfolder')
 if(not os.path.exists(os.path.join(mainfolder,'./emailattachfolder'))):
     os.mkdir(os.path.join(mainfolder,'./emailattachfolder'))
+#建立文件夹${setupdir}/compicturefolder
 logging.info('make dir:'+mainfolder+'/compicturefolder')
 if(not os.path.exists(os.path.join(mainfolder,'./compicturefolder'))):
     os.mkdir(mainfolder+'/compicturefolder')
 
-#articlepicfolder
+#建立文件夹${setupdir}/articlepicfolder
 logging.info('make dir:'+mainfolder+'/articlepicfolder')
 if(not os.path.exists(os.path.join(mainfolder,'./articlepicfolder'))):
     os.mkdir(mainfolder+'/articlepicfolder')
 
+#建立文件夹${setupdir}/mbfolder
+logging.info('make dir:'+mainfolder+'/mbfolder')
+if(not os.path.exists(os.path.join(mainfolder,'./mbfolder'))):
+    os.mkdir(mainfolder+'/mbfolder')
 
+#替换配置文件
 createNewScript(path_prop_bak,path_prop,'<setupdir>',mainfolder)
 
 #执行tomcat服务安装
