@@ -70,6 +70,7 @@ try:
     logging.info('Done.')
 except Exception as err:
     logging.warn('Service status abnormal: '+ str(err))
+    exit()
 
 #应该先判断.war包是否存在，不存在则不删除、不解压、不替换
                                       
