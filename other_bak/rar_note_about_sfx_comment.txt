@@ -1,0 +1,7 @@
+
+RAR的注释命令，Delete，对于文件夹没有起作用:
+Delete=czjpcoms_update\*
+或者
+Delete=czjpcoms_update
+
+都没有起作用。

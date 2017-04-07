@@ -1,10 +1,9 @@
 #coding:utf-8
-#以系统ANT进行编译打包webproject
-#以RAR自动建立SFX安装包:setup_czjpcoms_YYYYmmdd_HHmmSS.exe
-#建立的安装包路径"D:\ex_setup\setup_czjpcoms_windows\sfx_rar"
+#用于建立更新包
+#编译webapp内容,并打包为war文件，并创建rar自解压文件
+#建立更新包路径"D:\ex_setup\setup_czjpcoms_windows\sfx_rar"
 
 import os, sys, time, subprocess,logging,re
-
 
 #获取当前脚本路径
 def getCurrentDirPath():    
@@ -38,6 +37,7 @@ def executeScript(scriptpath):
         exit()
     logging.info('ExecuteScript end. ')
 
+#当前路径
 currentdir = getCurrentDirPath()
 
 #日志设定
@@ -54,23 +54,23 @@ logging.getLogger('').addHandler(console)
 
 logging.info("CURRENT SCRIPT POSITION: "+currentdir)
 logging.info("CHANGE DIR")
+#切换路径
+os.chdir(currentdir)
 
 
+#编译
 cmd_build = r'start cmd /k   "cd /d D:\Git_db\other_bak &&  echo Now building...  && ant -f buildczjpcoms.xml  && exit"'
 logging.info('Begin to build web project')
 executeScript(cmd_build)
 logging.info('finished building web project')
 
-
 os.chdir(r'D:\ex_setup\setup_czjpcoms_windows\tmp')
-
-#在【D:\ex_setup\setup_czjpcoms_windows\tmp】目录下执行
-sfxfilename = '\\setup_czjpcoms_win32_' + time.strftime('%Y%m%d_%H%M%S') +'.exe'
-#要想有图标，必需使用WinRAR命令而不是rar命令，因 "-iicon" 开关只存在于WinRAR命令，rar命令中没有此开关[-iiconD:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_all\bfp.ico]
-rarcmd = r'"C:\Program Files\WinRAR\rar.exe" a -r -sfx  -zD:\ex_setup\setup_czjpcoms_windows\rar_comment.txt ' + \
+#在[D:\ex_setup\setup_czjpcoms_windows\tmp]目录下打包czjpcoms_update目录
+sfxfilename = '\\update_czjpcoms_win32_'+time.strftime('%Y%m%d_%H%M%S')+ '.exe'
+rarcmd = r'"C:\Program Files\WinRAR\rar.exe" a -r -sfx  -zD:\ex_setup\setup_czjpcoms_windows\rar_comment_updatepack.txt ' + \
             r'D:\ex_setup\setup_czjpcoms_windows\sfx_rar' + \
             sfxfilename + \
-            r' czjpcoms_all\*'
+            r' czjpcoms_update\*'
 logging.info('The COMMAND IS: ['+ rarcmd +']')
 
 cmd1 = r'start cmd /k "cd /d D:\ex_setup\setup_czjpcoms_windows\tmp && echo Now creating... && '+ rarcmd  +r' && exit"'
@@ -78,9 +78,9 @@ cmd1 = r'start cmd /k "cd /d D:\ex_setup\setup_czjpcoms_windows\tmp && echo Now 
 logging.info('Begin to create SFX pack, please waiting...')
 executeScript(cmd1)
 
-
 logging.info('Create sfx SUCCESS: '+ os.path.join(r'D:\ex_setup\setup_czjpcoms_windows\sfx_rar',sfxfilename))
 
 
 
-           
+
+

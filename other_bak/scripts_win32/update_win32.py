@@ -1,19 +1,28 @@
 #coding:utf-8
 import os,sys,win32service,win32serviceutil,zipfile,logging,subprocess
+
+#更新仅针对webapp内容及数据库sql脚本（一般不含数据库程序文件本身及tomcat程序本身）
 #删除指定路径目录下的所有文件和文件夹或者文件(路径是文件)
+#执行目录为安装目录之下(czjpcoms_all/.)，更新包放在该目录下执行
+
 
 curfilepath = os.path.realpath(sys.argv[0])
 #print(curfilepath)
 b = os.path.split(curfilepath)
 curdir = b[0]  #当前脚本路径
 print(curdir)
-appfolder = os.path.join(curdir,'./tomcat7_win32/webapps')
+#目前app目录在： tomcat7_win32/czjpcoms
+
+#mainfolder应当是目前脚本的父目录
+mainfolder = os.path.abspath(os.path.join(curdir,'..'))
+
+appfolder = os.path.join(mainfolder,'./tomcat7_win32/czjpcoms')
 os.chdir(curdir)
 #日志设定
 logging.basicConfig(level=logging.INFO,
                         format='[%(asctime)s]%(filename)s[line:%(lineno)d][%(levelname)s] %(message)s ',                        
                         datefmt='%Y-%m-%d %H:%M:%S',
-                        filename= os.path.join( curdir, './log/install.log'),
+                        filename= os.path.join( mainfolder, './log/install.log'),
                         filemode='a')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
@@ -21,85 +30,134 @@ formatter = logging.Formatter('[%(levelname)s] %(message)s ')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 logging.info('current folder:'+curdir)
+logging.info('main folder:'+mainfolder)
 
 def emptyFolderOrFile(folderorfilepath):
     if os.path.isfile(folderorfilepath):
-        #print('[PATH IS FILE:] '+ folderorfilepath)
-        os.remove(folderorfilepath)
-    else:
-        #print('[PATH IS FOLDER:] '+ folderorfilepath)
-        for foldername, subdirs, filenames in os.walk( folderorfilepath, topdown =False):
-            #print('\r\ncurrent folder: '+foldername)
+        try:
+            os.remove(folderorfilepath)
+        except Exception as err:
+            logging.warn('remove file, Exception occur:'+str(err))
+            a = input("Press anykey1 ...")  
+    elif os.path.isdir(folderorfilepath):        
+        for foldername, subdirs, filenames in os.walk( folderorfilepath, topdown =False):           
             try:
-                for filename in filenames:
-                    #print('FILE INSIDE:['+foldername+']: '+filename)
+                for filename in filenames:                    
                     os.remove(os.path.join(foldername,filename))
-                for subdir in subdirs:
-                    #print('SUBFOLDER OF['+foldername+']: '+subdir)
+                for subdir in subdirs:                    
                     os.rmdir(os.path.join(foldername,subdir))
             except Exception as err:
-                print('Exception occur: '+ str(err))
+            	logging.warn('empty folder, Exception occur:'+str(err))
+            	a = input("Press anykey2 ...")    
 
 def createNewScript(bakpath,scriptpath,oldcontent,newcontent):
-    bakfile = open(bakpath,'r')
-    bakstr = bakfile.read()
-    bakstr = bakstr.replace(oldcontent, newcontent)
-    bakstr = bakstr.replace("\\",'/')
-    if(os.path.exists(scriptpath)):
-        os.unlink(scriptpath)       
-        logging.info('delete ok: '+scriptpath)
-    scriptfile = open(scriptpath,'w')
-    scriptfile.write(bakstr)
-    scriptfile.close()
-    bakfile.close()
+    try:
+        bakfile = open(bakpath,'r')
+        bakstr = bakfile.read()
+        bakstr = bakstr.replace(oldcontent, newcontent)
+        bakstr = bakstr.replace("\\",'/')
+        if(os.path.exists(scriptpath)):
+            os.unlink(scriptpath)       
+            logging.info('delete ok: '+scriptpath)
+        scriptfile = open(scriptpath,'w')
+        scriptfile.write(bakstr)
+        scriptfile.close()
+        bakfile.close()
+    except Exception as err:
+        logging.warn('createNewScript, Exception occur:'+str(err))
+        a = input("Press anykey to exit...")
+        exit()
     logging.info('create script ok: '+scriptpath )
 
+
+a = input("Press anykey to START UPDATE...")
 logging.info("===========[UPDATE START]================")
 
 #停止服务
-logging.info('Stop service...')
+
 try:
     t1 = win32serviceutil.QueryServiceStatus('tomcat7')
     m2 = win32serviceutil.QueryServiceStatus('mysql5.6')
     if(t1[1] == win32service.SERVICE_RUNNING):
+        logging.info('Stop service tomcat7...')
         win32serviceutil.StopService('tomcat7')
-    if(m2[1] == win32service.SERVICE_RUNNING):
-        win32serviceutil.StopService('mysql5.6')
+
     win32serviceutil.WaitForServiceStatus('tomcat7',win32service.SERVICE_STOPPED,30)
+    logging.info('Stop tomct7, Done.')
+    
+    if(m2[1] == win32service.SERVICE_RUNNING):
+        logging.info('Stop service mysql5.6...')
+        win32serviceutil.StopService('mysql5.6')
+    
     win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_STOPPED,30)
-    logging.info('Done.')
+    logging.info('Stop mysql5.6, Done.')
+    
 except Exception as err:
     logging.warn('Service status abnormal: '+ str(err))
+    a = input("Press anykey to exit...")
     exit()
 
-#应该先判断.war包是否存在，不存在则不删除、不解压、不替换
-                                      
+#应该先判断.war包是否存在，【不存在则不删除、不解压、不替换】
+#更新的war文件：./czjpcoms_update/czjpcoms.war
+path_newwar = os.path.join(mainfolder,'czjpcoms_update','czjpcoms.war')
+if(not os.path.exists(path_newwar)):
+	logging.warn('['+path_newwar+'] not exists, Please use correct update pack, EXIT')
+	exit()
+
 #删除当前旧wepapp下的app目录
 logging.info('Clear the old scripts folder... ')
 emptyFolderOrFile(appfolder)
-logging.info('Done. ')
+logging.info('Clear Done. ')
+#此处需要等待，否则解压不成功?*******************************************************************************************************************
+a = input("Press anykey to continue...")
+
 #解压新war包,在当前目录的新临时目录_tmp，即以"_tmp"为文件夹名打包.war文件和.sql文件
 logging.info('Extract new warfile...')
-path_newwar = os.path.join(curdir,'_tmp','czjpcoms.war')
 newwarfile = zipfile.ZipFile(path_newwar)
-newwarfile.extractall(os.path.join(curdir,'./tomcat7_win32/webapps/czjpcoms'))
-newwarfile.close()
-logging.info('Done.')
+#目前app目录在： tomcat7_win32/czjpcoms
+try:
+    newwarfile.extractall(os.path.join(mainfolder,'./tomcat7_win32/czjpcoms'))
+    newwarfile.close()
+except Exception as err:
+    logging.warn('Extract abnormal: '+ str(err))
+    a = input("Press anykey to exit...")
+    exit()
+logging.info('Extract Done.')
 
-#替换文件 prop文件和log4j配置文件
+#替换文件 log4j配置文件,【必需替换】
 logging.info('Replacing 2 files...')
-path_log4j = curdir + '/tomcat7_win32/webapps/czjpcoms/WEB-INF/classes/log4jex.xml'
-path_log4jex_bak = curdir + '/scripts_win32/log4jex.xml_bak'
-createNewScript(path_log4jex_bak, path_log4j, 'E:/log_czjpcoms/log.log', curdir + '/log/log.log')
+path_log4j = os.path.join(mainfolder,'tomcat7_win32','czjpcoms/WEB-INF/classes/log4jex.xml')
+path_log4jex_bak = os.path.join(mainfolder,'./czjpcoms_update/log4jex.xml_bak')
+if(not os.path.exists(path_log4jex_bak)):
+	logging.warn('['+path_log4jex_bak+'] not exists, Please use correct update pack, EXIT')
+	a = input("Press anykey to exit...")
+	exit()
+createNewScript(path_log4jex_bak, path_log4j, 'E:/log_czjpcoms/log.log', mainfolder + '/log/log.log')
 
-path_prop_bak = curdir + '/scripts_win32/settings.properties_bak'
-path_prop = curdir + '/tomcat7_win32/webapps/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties'
-if(not os.path.exists(os.path.join(curdir,'./emailattachfolder'))):
-    os.mkdir(os.path.join(curdir,'./emailattachfolder'))
-if(not os.path.exists(os.path.join(curdir,'./compicturefolder'))):
-    os.mkdir(curdir+'/compicturefolder')
-createNewScript(path_prop_bak,path_prop,'<setupdir>',curdir)
+#替换文件 prop文件,【必需替换】
+
+path_prop_bak = os.path.join(mainfolder,'./czjpcoms_update/settings.properties_bak')
+path_prop = os.path.join(mainfolder,'./tomcat7_win32/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties')
+if(not os.path.exists(path_prop_bak)):
+	logging.warn('['+path_prop_bak+'] not exists, Please use correct update pack, EXIT')
+	a = input("Press anykey to exit...")
+	exit()
+createNewScript(path_prop_bak,path_prop,'<setupdir>',mainfolder)
+
+#emailattachfolder
+if(not os.path.exists(os.path.join(mainfolder,'./emailattachfolder'))):
+    os.mkdir(os.path.join(mainfolder,'./emailattachfolder'))
+#compicturefolder
+if(not os.path.exists(os.path.join(mainfolder,'./compicturefolder'))):
+    os.mkdir(mainfolder+'/compicturefolder')
+#mbfolder
+if(not os.path.exists(os.path.join(mainfolder,'./mbfolder'))):
+    os.mkdir(mainfolder+'/mbfolder')
+#articlepicfolder
+if(not os.path.exists(os.path.join(mainfolder,'./articlepicfolder'))):
+    os.mkdir(mainfolder+'/articlepicfolder')
 logging.info('Done.')
+
 
 #开启服务
 logging.info('Start service...')
@@ -110,11 +168,11 @@ win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_RUNNING,30
 logging.info('Done.')
 
 #如果有sql文件还将执行导入sql文件
-sqlfilefolder = os.path.join(curdir,'_tmp')
+sqlfilefolder = os.path.join(mainfolder,'czjpcoms_update')
 objs = os.listdir(sqlfilefolder)
 for filename in objs:
-    if os.path.isfile and filename.endswith('.sql'):        
-        batcmd = curdir + r'/mysql_win32/bin/mysql.exe -uroot -pokisoft jpcorps<'+ os.path.join(curdir,r'_tmp',filename )
+    if os.path.isfile(os.path.join(mainfolder,r'czjpcoms_update',filename )) and filename.endswith('.sql'):        
+        batcmd = mainfolder + r'/mysql_win32/bin/mysql.exe -uroot -pokisoft jpcorps<'+ os.path.join(mainfolder,r'czjpcoms_update',filename )
         logging.info('START SQL commit: '+ filename)
         logging.info('START SQL commit: '+ batcmd)
         try:
@@ -126,11 +184,9 @@ for filename in objs:
             r1.close()
         except Exception as err:
                 logging.warn('SQL execute occur: '+ str(err))
+                a = input("Press anykey to exit...")
                 break
         logging.info('Done.')
-
-
-
 
 logging.info("===========[UPDATE FINISHED]================")
 a = input("Press anykey to finish...")

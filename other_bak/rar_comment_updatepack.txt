@@ -1,0 +1,10 @@
+;The comment below contains SFX script commands
+
+Delete=czjpcoms_update\*
+Setup=czjpcoms_update\update_win32.exe
+Silent=2
+Title=CZJPCOMS_UPDATE
+Text
+{
+UPDATING,PLEASE WAITING...
+}
