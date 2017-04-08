@@ -70,25 +70,23 @@ def createNewScript(bakpath,scriptpath,oldcontent,newcontent):
     logging.info('create script ok: '+scriptpath )
 
 
-a = input("Press anykey to START UPDATE...")
+#a = input("Press anykey to START UPDATE...")
 logging.info("===========[UPDATE START]================")
 
 #停止服务
 
 try:
-    t1 = win32serviceutil.QueryServiceStatus('tomcat7')
-    m2 = win32serviceutil.QueryServiceStatus('mysql5.6')
+    t1 = win32serviceutil.QueryServiceStatus('tomcat7')    
     if(t1[1] == win32service.SERVICE_RUNNING):
         logging.info('Stop service tomcat7...')
         win32serviceutil.StopService('tomcat7')
-
     win32serviceutil.WaitForServiceStatus('tomcat7',win32service.SERVICE_STOPPED,30)
     logging.info('Stop tomct7, Done.')
-    
+
+    m2 = win32serviceutil.QueryServiceStatus('mysql5.6')
     if(m2[1] == win32service.SERVICE_RUNNING):
         logging.info('Stop service mysql5.6...')
-        win32serviceutil.StopService('mysql5.6')
-    
+        win32serviceutil.StopService('mysql5.6')    
     win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_STOPPED,30)
     logging.info('Stop mysql5.6, Done.')
     
@@ -108,12 +106,17 @@ if(not os.path.exists(path_newwar)):
 logging.info('Clear the old scripts folder... ')
 emptyFolderOrFile(appfolder)
 logging.info('Clear Done. ')
+
+
+##while(os.listdir(appfolder)):
+##    pass
+
 #此处需要等待，否则解压不成功?*******************************************************************************************************************
-a = input("Press anykey to continue...")
+#a = input("Press anykey to continue...")
 
 #解压新war包,在当前目录的新临时目录_tmp，即以"_tmp"为文件夹名打包.war文件和.sql文件
 logging.info('Extract new warfile...')
-newwarfile = zipfile.ZipFile(path_newwar)
+newwarfile = zipfile.ZipFile(path_newwar,'r')
 #目前app目录在： tomcat7_win32/czjpcoms
 try:
     newwarfile.extractall(os.path.join(mainfolder,'./tomcat7_win32/czjpcoms'))
@@ -135,7 +138,6 @@ if(not os.path.exists(path_log4jex_bak)):
 createNewScript(path_log4jex_bak, path_log4j, 'E:/log_czjpcoms/log.log', mainfolder + '/log/log.log')
 
 #替换文件 prop文件,【必需替换】
-
 path_prop_bak = os.path.join(mainfolder,'./czjpcoms_update/settings.properties_bak')
 path_prop = os.path.join(mainfolder,'./tomcat7_win32/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties')
 if(not os.path.exists(path_prop_bak)):
@@ -162,9 +164,10 @@ logging.info('Done.')
 #开启服务
 logging.info('Start service...')
 win32serviceutil.StartService('mysql5.6')
+win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_RUNNING,30)
 win32serviceutil.StartService('tomcat7')
 win32serviceutil.WaitForServiceStatus('tomcat7',win32service.SERVICE_RUNNING,30)
-win32serviceutil.WaitForServiceStatus('mysql5.6',win32service.SERVICE_RUNNING,30)
+
 logging.info('Done.')
 
 #如果有sql文件还将执行导入sql文件
