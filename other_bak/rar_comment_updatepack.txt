@@ -1,6 +1,6 @@
 ;The comment below contains SFX script commands
-
-
+;Overwrite all
+Overwrite=1
 Setup=czjpcoms_update\update_win32.exe
 Silent=2
 Title=CZJPCOMS_UPDATE
