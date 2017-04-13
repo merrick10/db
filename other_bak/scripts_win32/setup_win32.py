@@ -125,31 +125,44 @@ path_log4j = mainfolder + '/tomcat7_win32/czjpcoms/WEB-INF/classes/log4jex.xml'
 path_log4jex_bak = currentdir + '/log4jex.xml_bak'
 createNewScript(path_log4jex_bak, path_log4j, 'E:/log_czjpcoms/log.log', mainfolder + '/log/log.log')
 
+userdatafolder = os.path.join(mainfolder,'./userdata')
+
 #替换配置文件有关图片和附件文件夹路径
 #${tomcatwebapps}/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties
 path_prop_bak = currentdir + '/settings.properties_bak'
 path_prop = mainfolder + '/tomcat7_win32/czjpcoms/WEB-INF/classes/com/czjpcoms/utils/settings.properties'
 #替换配置文件
-createNewScript(path_prop_bak,path_prop,'<setupdir>',mainfolder)
+createNewScript(path_prop_bak,path_prop,'<setupdir>',userdatafolder)
 
-#建立文件夹${setupdir}/emailattachfolder
-logging.info('make dir:'+mainfolder+'/emailattachfolder')
-if(not os.path.exists(os.path.join(mainfolder,'./emailattachfolder'))):
-    os.mkdir(os.path.join(mainfolder,'./emailattachfolder'))
-#建立文件夹${setupdir}/compicturefolder
-logging.info('make dir:'+mainfolder+'/compicturefolder')
-if(not os.path.exists(os.path.join(mainfolder,'./compicturefolder'))):
-    os.mkdir(mainfolder+'/compicturefolder')
+def createdatafolder(userdatafolder):
+    try:
+        logging.info('make dir:'+userdatafolder)
+        if(not os.path.exists(userdatafolder)):
+            os.mkdir(userdatafolder)
 
-#建立文件夹${setupdir}/articlepicfolder
-logging.info('make dir:'+mainfolder+'/articlepicfolder')
-if(not os.path.exists(os.path.join(mainfolder,'./articlepicfolder'))):
-    os.mkdir(mainfolder+'/articlepicfolder')
+        #建立文件夹${setupdir}/emailattachfolder
+        logging.info('make dir:'+userdatafolder+'/emailattachfolder')
+        if(not os.path.exists(os.path.join(userdatafolder,'./emailattachfolder'))):
+            os.mkdir(os.path.join(userdatafolder,'./emailattachfolder'))
+        #建立文件夹${setupdir}/compicturefolder
+        logging.info('make dir:'+userdatafolder+'/compicturefolder')
+        if(not os.path.exists(os.path.join(userdatafolder,'./compicturefolder'))):
+            os.mkdir(userdatafolder+'/compicturefolder')
 
-#建立文件夹${setupdir}/mbfolder
-logging.info('make dir:'+mainfolder+'/mbfolder')
-if(not os.path.exists(os.path.join(mainfolder,'./mbfolder'))):
-    os.mkdir(mainfolder+'/mbfolder')
+        #建立文件夹${setupdir}/articlepicfolder
+        logging.info('make dir:'+userdatafolder+'/articlepicfolder')
+        if(not os.path.exists(os.path.join(userdatafolder,'./articlepicfolder'))):
+            os.mkdir(userdatafolder+'/articlepicfolder')
+
+        #建立文件夹${setupdir}/mbfolder
+        logging.info('make dir:'+userdatafolder+'/mbfolder')
+        if(not os.path.exists(os.path.join(userdatafolder,'./mbfolder'))):
+            os.mkdir(userdatafolder+'/mbfolder')
+    except Exception as err:
+        logging.warn('Exception occur:'+str(err))
+        exit()
+
+createdatafolder(userdatafolder)
 
 #执行tomcat服务安装
 executeScript( os.path.join( currentdir,'./tomcat_install_win32.bat'))
