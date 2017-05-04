@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v12.09 (32 bit)
-MySQL - 5.5.16 : Database - jpcorps
+MySQL - 5.6.29 : Database - jpcorps
 *********************************************************************
 */
 
@@ -13,7 +13,6 @@ MySQL - 5.5.16 : Database - jpcorps
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP DATABASE IF EXISTS `jpcorps`;
-
 CREATE DATABASE /*!32312 IF NOT EXISTS*/`jpcorps` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
 USE `jpcorps`;
@@ -171,7 +170,7 @@ CREATE TABLE `settings` (
 
 /*Data for the table `settings` */
 
-insert  into `settings`(`id`,`name`,`dtype`,`level`,`remark`) values ('001','日系独資企業','COMFORM',NULL,NULL),('001','機械','COMPROFESS',NULL,NULL),('001','smtp','EMAILSET',NULL,NULL),('002','合弁企業','COMFORM',NULL,NULL),('002','化学','COMPROFESS',NULL,NULL),('002','smtp.sina.com','EMAILSET',NULL,NULL),('003','中華系企業','COMFORM',NULL,NULL),('003','電気','COMPROFESS',NULL,NULL),('003','25','EMAILSET',NULL,NULL),('004','常州以外','COMFORM',NULL,NULL),('004','部品製造','COMPROFESS',NULL,NULL),('004','1','EMAILSET',NULL,NULL),('005','その他','COMFORM',NULL,NULL),('005','その他製造','COMPROFESS',NULL,NULL),('005','0','EMAILSET',NULL,NULL),('006','服飾雑貨','COMPROFESS',NULL,NULL),('006','','EMAILSET',NULL,NULL),('007','貿易','COMPROFESS',NULL,NULL),('007','merrick80@sina.com','EMAILSET',NULL,NULL),('008','運輸','COMPROFESS',NULL,NULL),('008','merrick80@sina.com','EMAILSET',NULL,NULL),('009','飲食','COMPROFESS',NULL,NULL),('009','miao12345','EMAILSET',NULL,NULL),('010','サービス','COMPROFESS',NULL,NULL),('010','[ADMIN-2017]','EMAILSET',NULL,NULL),('011','その他','COMPROFESS',NULL,NULL),('011','pop3','EMAILSET',NULL,NULL),('012','0','EMAILSET',NULL,NULL),('013','pop.sina.com','EMAILSET',NULL,NULL),('014','110','EMAILSET',NULL,NULL),('015','0','EMAILSET',NULL,NULL);
+insert  into `settings`(`id`,`name`,`dtype`,`level`,`remark`) values ('001','日系独資企業','COMFORM',NULL,NULL),('001','機械','COMPROFESS',NULL,NULL),('001','smtp','EMAILSET',NULL,NULL),('002','合弁企業','COMFORM',NULL,NULL),('002','化学','COMPROFESS',NULL,NULL),('002','smtp.sina.com','EMAILSET',NULL,NULL),('003','中華系企業','COMFORM',NULL,NULL),('003','電気','COMPROFESS',NULL,NULL),('003','25','EMAILSET',NULL,NULL),('004','常州以外','COMFORM',NULL,NULL),('004','部品製造','COMPROFESS',NULL,NULL),('004','1','EMAILSET',NULL,NULL),('005','その他','COMFORM',NULL,NULL),('005','その他製造','COMPROFESS',NULL,NULL),('005','0','EMAILSET',NULL,NULL),('006','服飾雑貨','COMPROFESS',NULL,NULL),('006','','EMAILSET',NULL,NULL),('007','貿易','COMPROFESS',NULL,NULL),('007','merrick80@sina.com','EMAILSET',NULL,NULL),('008','運輸','COMPROFESS',NULL,NULL),('008','merrick80@sina.com','EMAILSET',NULL,NULL),('009','飲食','COMPROFESS',NULL,NULL),('009','miao12345','EMAILSET',NULL,NULL),('01','','VISAMAILSET',NULL,NULL),('010','サービス','COMPROFESS',NULL,NULL),('010','[ADMIN-2017]','EMAILSET',NULL,NULL),('011','その他','COMPROFESS',NULL,NULL),('011','pop3','EMAILSET',NULL,NULL),('012','0','EMAILSET',NULL,NULL),('013','pop.sina.com','EMAILSET',NULL,NULL),('014','110','EMAILSET',NULL,NULL),('015','0','EMAILSET',NULL,NULL),('02','','VISAMAILSET',NULL,NULL),('03','','VISAMAILSET',NULL,NULL),('04','','VISAMAILSET',NULL,NULL);
 
 /*Table structure for table `siteuser` */
 
