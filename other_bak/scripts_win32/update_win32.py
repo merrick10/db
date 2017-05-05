@@ -16,6 +16,8 @@ print(curdir)
 #mainfolder应当是目前脚本的父目录
 mainfolder = os.path.abspath(os.path.join(curdir,'..'))
 
+userdatafolder = os.path.join(mainfolder,'./userdata')
+
 appfolder = os.path.join(mainfolder,'./tomcat7_win32/czjpcoms')
 os.chdir(curdir)
 #日志设定
@@ -144,19 +146,22 @@ if(not os.path.exists(path_prop_bak)):
 	logging.warn('['+path_prop_bak+'] not exists, Please use correct update pack, EXIT')
 	a = input("Press anykey to exit...")
 	exit()
-createNewScript(path_prop_bak,path_prop,'<setupdir>',mainfolder)
+createNewScript(path_prop_bak,path_prop,'<setupdir>',userdatafolder)
+
+
+
 
 #emailattachfolder
-if(not os.path.exists(os.path.join(mainfolder,'./emailattachfolder'))):
+if(not os.path.exists(os.path.join(userdatafolder,'./emailattachfolder'))):
     os.mkdir(os.path.join(mainfolder,'./emailattachfolder'))
 #compicturefolder
-if(not os.path.exists(os.path.join(mainfolder,'./compicturefolder'))):
+if(not os.path.exists(os.path.join(userdatafolder,'./compicturefolder'))):
     os.mkdir(mainfolder+'/compicturefolder')
 #mbfolder
-if(not os.path.exists(os.path.join(mainfolder,'./mbfolder'))):
+if(not os.path.exists(os.path.join(userdatafolder,'./mbfolder'))):
     os.mkdir(mainfolder+'/mbfolder')
 #articlepicfolder
-if(not os.path.exists(os.path.join(mainfolder,'./articlepicfolder'))):
+if(not os.path.exists(os.path.join(userdatafolder,'./articlepicfolder'))):
     os.mkdir(mainfolder+'/articlepicfolder')
 logging.info('Done.')
 
