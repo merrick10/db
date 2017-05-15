@@ -71,10 +71,40 @@ def createNewScript(bakpath,scriptpath,oldcontent,newcontent):
         exit()
     logging.info('create script ok: '+scriptpath )
 
+#获取升级包版本信息
+def versioninfo(updatefolder):
+    try:
+        fp = open(os.path.join(updatefolder,'./version.txt'),'r')
+        verstr = fp.readline()
+        fp.close()
+        logging.info(r'VERSION: ['+ verstr +r']')
+        fwp = open(os.path.join(updatefolder,'..','./version.txt'),'w')
+        fwp.write(verstr)
+        fwp.close()
+        os.remove(os.path.join(updatefolder,'./version.txt'))
+
+    except Exception as err:
+        logging.warn('read version info:fail'+str(err))
+        exit()
+##
+##改写版本信息纯文本文件
+##def createversionfile():
+##    logging.info('create version file: ver.txt')
+##    try:
+##        verstr = time.strftime('%Y%m%d')
+##        filepathstr = r'D:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_update\version.txt'
+##        fp = open(filepathstr,'w')
+##        fp.write(verstr)
+##        fp.close()            
+##
+##    except Exception as err:
+##        logging.warn('create version file error:'+ str(err))
+##        exit()
+
 
 #a = input("Press anykey to START UPDATE...")
 logging.info("===========[UPDATE START]================")
-
+versioninfo(curdir)
 #停止服务
 
 try:

@@ -36,6 +36,20 @@ def executeScript(scriptpath):
         logging.warn('Exception occur:'+str(err))
         exit()
     logging.info('ExecuteScript end. ')
+    
+#生成版本信息纯文本文件
+def createversionfile():
+    logging.info('create version file: ver.txt')
+    try:
+        verstr = time.strftime('%Y%m%d')
+        filepathstr = r'D:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_update\version.txt'
+        fp = open(filepathstr,'w')
+        fp.write(verstr)
+        fp.close()            
+
+    except Exception as err:
+        logging.warn('create version file error:'+ str(err))
+        exit()
 
 #当前路径
 currentdir = getCurrentDirPath()
@@ -57,6 +71,7 @@ logging.info("CHANGE DIR")
 #切换路径
 os.chdir(currentdir)
 
+createversionfile()
 
 #编译
 cmd_build = r'start cmd /k   "cd /d D:\Git_db\other_bak &&  echo Now building...  && ant -f buildczjpcoms.xml  && exit"'

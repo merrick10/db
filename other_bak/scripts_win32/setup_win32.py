@@ -54,8 +54,20 @@ def executeScript(scriptpath):
         r1.close()
     except Exception as err:
         logging.warn('Exception occur:'+str(err))
-        exit()        
+        exit()       
     logging.info('finished install service')
+
+
+def versioninfo(vfilepath):
+    try:
+        fp = open(vfilepath,'r')
+        verstr = fp.readline()
+        fp.close()
+        logging.info(r'VERSION: ['+ verstr +r']')
+
+    except Exception as err:
+        logging.warn('read version info:fail'+str(err))
+        exit()   
 
 currentdir = getCurrentDirPath()
 print("CURRENT SCRIPT POSITION: "+currentdir)
@@ -77,6 +89,8 @@ logging.getLogger('').addHandler(console)
     
 
 logging.info('=========================[Installation Start:]============================')
+
+versioninfo(os.path.join(mainfolder,r'./version.txt'))
 logging.info('current dir:'+currentdir)
 logging.info('main dir:'+mainfolder)
 

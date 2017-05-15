@@ -38,6 +38,20 @@ def executeScript(scriptpath):
         exit()
     logging.info('ExecuteScript end. ')
 
+#生成版本信息纯文本文件
+def createversionfile():
+    logging.info('create version file: ver.txt')
+    try:
+        verstr = time.strftime('%Y%m%d')
+        filepathstr = r'D:\ex_setup\setup_czjpcoms_windows\tmp\czjpcoms_all\version.txt'
+        fp = open(filepathstr,'w')
+        fp.write(verstr)
+        fp.close()            
+
+    except Exception as err:
+        logging.warn('create version file error:'+ str(err))
+        exit()
+
 currentdir = getCurrentDirPath()
 
 #日志设定
@@ -63,6 +77,8 @@ logging.info('finished building web project')
 
 
 os.chdir(r'D:\ex_setup\setup_czjpcoms_windows\tmp')
+
+createversionfile()
 
 #在【D:\ex_setup\setup_czjpcoms_windows\tmp】目录下执行
 sfxfilename = '\\setup_czjpcoms_win32_' + time.strftime('%Y%m%d_%H%M%S') +'.exe'
