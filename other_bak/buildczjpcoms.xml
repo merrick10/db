@@ -16,7 +16,7 @@
 	<property name="tmpdir" value="D:/ex_setup/tmp/tmp_${DSTAMP}_${TSTAMP}/" ></property>
 	<!--setup collection folder -->
 	<property name="setupcollectionfolder" value="D:/ex_setup/setup_czjpcoms_windows/" ></property>
-	<property name="packfolder_win32" value="D:/ex_setup/setup_czjpcoms_windows/win32/" ></property>
+
 	<property name="tmp_czjpcoms_all_win32" value="D:/ex_setup/setup_czjpcoms_windows/tmp/czjpcoms_all/" ></property>
 	
 	<!-- for update -->
@@ -129,7 +129,7 @@
     <target name="cpwar" depends="createwarfile">
             <copy todir="${tomcat.webappfoler}" file="${warfile}" overwrite="yes"></copy>    	
     		<copy todir="${setupcollectionfolder}" file="${warfile}" overwrite="yes"></copy>
-    		<copy todir="${packfolder_win32}" file="${warfile}" overwrite="yes"></copy>    	
+  	
     		<copy todir="${tmp_czjpcoms_all_win32}" file="${warfile}" overwrite="yes"></copy>    		
     		<copy todir="${tmp_czjpcoms_update_win32}" file="${warfile}" overwrite="yes"></copy> 
     </target>
