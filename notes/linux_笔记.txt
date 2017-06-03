@@ -1,0 +1,59 @@
+======================================================================================
+Linux下：
+
+python安装(比如3.6版)需要root权限;
+
+apache2的安装(源码编译版),make install需要root权限,configure和make不需要root权限;
+
+-----------------------------------------------------------------------------------
+CentOS(5)自带的apache2.2.3，
+默认启动，占用80端口,
+
+[停止]：
+进入/usr/sbin/目录，使用命令‘sudo ./httpd -k stop’停止apache服务器；
+
+[查询]：rpm -qa|grep httpd
+
+[删除]: rpm -e httpd-2.2.3-**可能失败，
+1，存在依赖逐一删除依赖，或者加参数‘--nodeps’,
+2，报错：“%preun(httpd-2.2.3-43.el5.centos.i386) scriptlet failed”，
+采用rpm -e httpd --noscripts进行卸载。（其他卸载参数：--nopreun）
+删除系统自带的mysql同样可以用上述类似命令进行。
+----------------------------------------------------------------------
+【MySQL数据库5.7免安装版Linux下安装及初始化】
+
+[mysql数据库的配置]：
+主目录建立my.cnf(可复制support-files目录下的配置再修改)，属性内容如下：
+basedir =/home/merrick/czjcc/mysql/
+datadir =/home/merrick/czjcc/mysql/data/
+port =13306
+socket =/home/merrick/czjcc/mysql/socket/mysql.sock
+pid-file=/home/merrick/czjcc/mysql/pid/mysql.pid
+log-error=/home/merrick/czjcc/mysql/logs/mysql.log
+user=merrick
+sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES 
+
+
+[mysql数据库的初始化]：
+进入mysql主目录，确保datadir参数对应目录下为空，执行：
+bin/mysqld --initialize  --basedir=/home/merrick/czjcc/mysql/ --datadir=/home/merrick/czjcc/mysql/data/
+对于mysql5.7的初始化，会在屏幕上显示随机产生的初始密码，比如：“A temporary password is generated for root@localhost: tlsfUT1Cse;h”
+
+[命令启动mysql]：
+bin/mysqld_safe --defaults-file=my.cnf &
+
+[命令行访问mysql]：
+bin/mysql -h127.0.0.1 -P13306 -uroot -pxxxxxx
+
+[修改mysql初始root密码]：
+alter user root@localhost identified by 'pswpsw';
+
+[添加远程用户]：
+create user 'jcc'@'192.168.245.1' identified by '123456';
+
+[授权远程用户所有权限]：
+GRANT ALL ON *.* TO 'jcc'@'192.168.245.1';
+
+[导入外部sql脚本文件]：
+bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpcorps_1_win32.sql
+---------------------------------------------------------------------------------------------------
