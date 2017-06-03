@@ -20,7 +20,7 @@ CentOS(5)自带的apache2.2.3，
 采用rpm -e httpd --noscripts进行卸载。（其他卸载参数：--nopreun）
 删除系统自带的mysql同样可以用上述类似命令进行。
 ----------------------------------------------------------------------
-【MySQL数据库5.7免安装版Linux下安装及初始化】
+【MySQL数据库5.7免安装版Linux下(CentOS5.5)安装及初始化】
 
 [mysql数据库的配置]：
 主目录建立my.cnf(可复制support-files目录下的配置再修改)，属性内容如下：
@@ -56,4 +56,13 @@ GRANT ALL ON *.* TO 'jcc'@'192.168.245.1';
 
 [导入外部sql脚本文件]：
 bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpcorps_1_win32.sql
+
+
+[安装为系统服务](需要root权限)：
+1，复制服务启动脚本：$ sudo cp support-files/mysql.server /etc/init.d/mysql
+2，复制配置文件：# cp /home/merrick/czjcc/mysql/my.cnf /etc/my.cnf
+3，启动服务：# service mysql start
+4，查看服务情况：# netstat -tlunp|grep mysql
+5,设置开机自启动：# chkconfig --add mysql
+6,设置各模式启动开关：#chkconfig --level 345 mysql on
 ---------------------------------------------------------------------------------------------------
