@@ -47,6 +47,7 @@ bin/mysql -h127.0.0.1 -P13306 -uroot -pxxxxxx
 
 [修改mysql初始root密码]：
 alter user root@localhost identified by 'pswpsw';
+或者(未连接状态)：bin/mysqladmin -uroot password yourpassword
 
 [添加远程用户]：
 create user 'jcc'@'192.168.245.1' identified by '123456';
@@ -58,11 +59,91 @@ GRANT ALL ON *.* TO 'jcc'@'192.168.245.1';
 bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpcorps_1_win32.sql
 
 
-[安装为系统服务](需要root权限)：
+[安装为系统服务](需要root用户)：
 1，复制服务启动脚本：$ sudo cp support-files/mysql.server /etc/init.d/mysql
 2，复制配置文件：# cp /home/merrick/czjcc/mysql/my.cnf /etc/my.cnf
 3，启动服务：# service mysql start
 4，查看服务情况：# netstat -tlunp|grep mysql
 5,设置开机自启动：# chkconfig --add mysql
 6,设置各模式启动开关：#chkconfig --level 345 mysql on
+
+注意：/etc/init.d/mysql文件配置的自动启动和停止优先级为64和36：
+# chkconfig: 2345 64 36
+
 ---------------------------------------------------------------------------------------------------
+
+[Linux下安装jdk(仅单一用户)]：
+1，解压jdk-7u71-linux-i586.tar.gz：
+	$ jdk-7u71-linux-i586.tar.gz
+2，改名：
+	$ mv jdk-7u71-linux-i586 jdk
+3，设定本用户环境变量，修改~/.bash_profile：
+	PATH=$PATH:$HOME
+	export JAVA_HOME=/home/merrick/jdk
+	export JRE_HOME=$JAVA_HOME/jre
+	export PATH=$JAVA_HOME/bin:$PATH
+4，环境变量生效：
+	$ source .bash_profile
+
+----------------------------------------------------------------------------------------------------
+[Linux下(CentOS5.5)tomcat7(免安装版)的安装](已设定好上述步骤的JDK环境变量)：
+1，解压apache-tomcat-7.0.68.tar.gz到用户主目录：
+	$ tar xvf apache-tomcat-7.0.68.tar.gz
+2，改名
+	$ mv apache-tomcat-7.0.68 tomcat7
+3，启动：
+	bin]$  ./startup.sh
+
+[安装为系统服务](需要系统root用户操作)
+1，把$TOMCAT_HOME/bin/commons-daemon-native.tar.gz解压
+	$ tar xvf commons-daemon-native.tar.gz
+
+2，进入$TOMCAT_HOME/bin/commons-daemon-1.0.15-native-src/unix/ ，执行配置和编译
+	$ cd commons-daemon-1.0.15-native-src/unix/
+ 	$ ./configure --with-java=/usr/local/java/
+ 	$ make
+
+3，复制编译好的jsvc到“${CATALINA_BASE}/bin/” 目录下；
+
+4，修改$TOMCAT_HOME/bin/daemon.sh，添加JDK环境变量(虽然已设置JDK系统环境变量，这里还是要设置)：
+JAVA_HOME=/home/merrick/czjcc/jdk
+
+5，建立软链接到系统启动项:
+	# ln -s $TOMCAT_HOME/bin/daemon.sh /etc/init.d/tomcat
+	或者# cp $TOMCAT_HOME/bin/daemon.sh /etc/init.d/tomcat，但是这样需要修改tomcat主目录环境变量：test “.$CATALINA_HOME” = . && CATALINA_HOME=”/home/merrick/czjcc/tomcat”
+
+6，把tomcat加入chkconfig系统管理并随系统启动而启动服务，还需要在$TOMCAT_HOME/bin/daemon.sh开头添加两行注释内容(考虑到tomcat需要在mysql之后启动，所以优先级设的低一些，数字越大优先级越低，启动和关闭都是90)：
+	# chkconfig: 2345 90 90
+	# description: Tomcat7 daemon
+
+7，加入chkconfig系统服务管理，以便系统启动时tomcat自动启动服务：
+	# chkconfig --add tomcat
+
+8，管理tomcat服务：
+	查看: # chkconfig --list|grep tomcat
+	启动：# service tomcat start
+	关闭：# service tomcat stop
+
+9，为安全起见使tomcat始终运行于普通用户，改变一下tomcat目录的属主：
+	chown -R user:usergroup /home/merrick/czjcc/tomcat/
+
+
+注：80端口还是需要root用户启动
+
+------------------------------------------------------------------------------------------------------------	
+	
+
+
+---------------------------------------------------------------------------------------------------------
+
+linux下一次性建立多层不存在的目录：
+$ mkdir -p /home/xxx/1/2/3/4
+-------------------------------------------------------------------------------------------------------------
+linux下解压.war文件：
+# unzip -oq common.war -d common
+unzip -d 指定目录
+---------------------------------------------------------------------------------------------------------
+
+
+本webapp在linux下安装配置涉及的内容(手动，参考windows下的自动安装过程脚本)：
+
