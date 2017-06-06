@@ -35,19 +35,23 @@ sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
 
 
 [mysql数据库的初始化]：
+建立文件夹：/home/merrick/czjcc/mysql/logs/和/home/merrick/czjcc/mysql/pid/
 进入mysql主目录，确保datadir参数对应目录下为空，执行：
 bin/mysqld --initialize  --basedir=/home/merrick/czjcc/mysql/ --datadir=/home/merrick/czjcc/mysql/data/
 对于mysql5.7的初始化，会在屏幕上显示随机产生的初始密码，比如：“A temporary password is generated for root@localhost: tlsfUT1Cse;h”
+															
+
 
 [命令启动mysql]：
 bin/mysqld_safe --defaults-file=my.cnf &
 
 [命令行访问mysql]：
+(必需是当前用户，当前session)
 bin/mysql -h127.0.0.1 -P13306 -uroot -pxxxxxx
 
 [修改mysql初始root密码]：
 alter user root@localhost identified by 'pswpsw';
-或者(未连接状态)：bin/mysqladmin -uroot password yourpassword
+
 
 [添加远程用户]：
 create user 'jcc'@'192.168.245.1' identified by '123456';
@@ -56,6 +60,7 @@ create user 'jcc'@'192.168.245.1' identified by '123456';
 GRANT ALL ON *.* TO 'jcc'@'192.168.245.1';
 
 [导入外部sql脚本文件]：
+(注意必须是127.0.0.1，是localhost还会报错)
 bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpcorps_1_win32.sql
 
 
@@ -92,9 +97,9 @@ bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpco
 2，改名
 	$ mv apache-tomcat-7.0.68 tomcat7
 3，启动：
-	bin]$  ./startup.sh
+	$  bin/startup.sh
 
-[安装为系统服务](需要系统root用户操作)
+[安装为系统服务](需要系统root用户操作，守护进程脚本程序交系统服务执行)
 1，把$TOMCAT_HOME/bin/commons-daemon-native.tar.gz解压
 	$ tar xvf commons-daemon-native.tar.gz
 
@@ -106,13 +111,14 @@ bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpco
 3，复制编译好的jsvc到“${CATALINA_BASE}/bin/” 目录下；
 
 4，修改$TOMCAT_HOME/bin/daemon.sh，添加JDK环境变量(虽然已设置JDK系统环境变量，这里还是要设置)：
-JAVA_HOME=/home/merrick/czjcc/jdk
+	JAVA_HOME=/home/merrick/czjcc/jdk
 
-5，建立软链接到系统启动项:
+5，建立软链接到系统服务管理项:
 	# ln -s $TOMCAT_HOME/bin/daemon.sh /etc/init.d/tomcat
 	或者# cp $TOMCAT_HOME/bin/daemon.sh /etc/init.d/tomcat，但是这样需要修改tomcat主目录环境变量：test “.$CATALINA_HOME” = . && CATALINA_HOME=”/home/merrick/czjcc/tomcat”
 
-6，把tomcat加入chkconfig系统管理并随系统启动而启动服务，还需要在$TOMCAT_HOME/bin/daemon.sh开头添加两行注释内容(考虑到tomcat需要在mysql之后启动，所以优先级设的低一些，数字越大优先级越低，启动和关闭都是90)：
+6，把tomcat加入chkconfig系统管理并随系统启动而启动服务，
+	还需要在$TOMCAT_HOME/bin/daemon.sh开头添加两行注释内容(考虑到tomcat需要在mysql之后启动，所以优先级设的低一些，数字越大优先级越低，启动和关闭都是90)：
 	# chkconfig: 2345 90 90
 	# description: Tomcat7 daemon
 
@@ -128,7 +134,7 @@ JAVA_HOME=/home/merrick/czjcc/jdk
 	chown -R user:usergroup /home/merrick/czjcc/tomcat/
 
 
-注：80端口还是需要root用户启动
+注：80端口还是需要root用户启动,可以使用iptalbes的端口转发(80转8080)实现80端口服务
 
 ------------------------------------------------------------------------------------------------------------	
 	
@@ -142,8 +148,141 @@ $ mkdir -p /home/xxx/1/2/3/4
 linux下解压.war文件：
 # unzip -oq common.war -d common
 unzip -d 指定目录
----------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
+
+本webapp在linux下安装配置涉及的内容(手动安装配置，参考windows下的自动安装过程脚本)：
 
 
-本webapp在linux下安装配置涉及的内容(手动，参考windows下的自动安装过程脚本)：
+一，建立web应用的目录结构(普通用户操作)
+1，建立目录：
+	$HOME/czjcc/
+	$HOME/czjcc/
+	$HOME/czjcc/log/
+	$HOME/cjzcc/userdata/articlepicfolder/
+	$HOME/cjzcc/userdata/compicturefolder/
+	$HOME/cjzcc/userdata/emailattachfolder/
+	$HOME/cjzcc/userdata/mbfolder/
+
+二，安装mysql(绿色版)(普通用户操作)，mysql初始化，并配置为系统服务和自启动(root用户操作)
+1，复制mysql到$HOME目录，进入$HOME目录，解压文件到$HOME/czjcc/，并改目录名
+	$ cd
+	$ tar xvf mysql-5.7.14-linux-glibc2.5-i686.tar.gz -C $HOME/czjcc/
+	$ mv $HOME/czjcc/mysql-5.7.14-linux-glibc2.5-i686/ $HOME/czjcc/mysql/
+
+2，建立my.cnf文件($HOME/czjcc/mysql/my.cnf)(均为绝对路径,merrick为安装用户)，内容如下：
+
+	basedir =/home/merrick/czjcc/mysql/
+	datadir =/home/merrick/czjcc/mysql/data/
+	port =13306
+	socket =/home/merrick/czjcc/mysql/socket/mysql.sock
+	pid-file=/home/merrick/czjcc/mysql/pid/mysql.pid
+	log-error=/home/merrick/czjcc/mysql/logs/mysql.log
+	user=merrick
+	sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+
+3，数据库初始化及配置：
+		进入mysql主目录，确保datadir参数对应目录下为空，
+	a,[首先建立以上配置对应目录]：		
+		/home/merrick/czjcc/mysql/socket/，/home/merrick/czjcc/mysql/pid/，/home/merrick/czjcc/mysql/logs/
+
+	b,[执行初始化动作]：
+		$ cd $HOME/czjcc/mysql
+		$ bin/mysqld --initialize  --basedir=/home/merrick/czjcc/mysql/ --datadir=/home/merrick/czjcc/mysql/data/
+
+		对于mysql5.7的初始化，会在屏幕上显示随机产生的初始密码，比如：“A temporary password is generated for root@localhost: tlsfUT1Cse;h”
+
+	c,[命令行启动]
+		(停止可以kill对应活动线程)
+		$ cd $HOME/czjcc/mysql/
+		$ bin/mysqld_safe -defaults-file=my.cnf &
+
+	d,[命令行访问mysql]：
+		(必需是当前用户，地址必需是127.0.0.1，不能是localhost，当前session)
+		$ bin/mysql -h127.0.0.1 -P13306 -uroot -pxxxxxx
+
+	e,[给app使用的用户需要添加并库授权(app在本地，和数据同一机器)]：
+		mysql> create user 'czjcc'@'localhost' identified by '123456';
+		mysql> grant all on *.* to 'czjcc'@'localhost';
+
+	f,[导入外部sql脚本文件]：
+		(注意必须是127.0.0.1，是localhost还会报错)
+		$ bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpcorps_1_win32.sql
+
+	g,[配置为系统服务，并设定为开机启动]：
+		复制配置文件和系统服务启停脚本：
+		# cp /home/merrick/czjcc/mysql/my.cnf /etc/my.cnf
+		# cp /home/merrick/czjcc/mysql/support-files/mysql.server /etc/init.d/mysql
+		这样就可以用命令启停mysql：
+			启动：# service mysql start
+			停止：# service mysql stop			
+
+		设置开机启动：
+			# chkconfig --add mysql
+			# chkconfig --level 345 mysql on
+
+		注意：/etc/init.d/mysql文件配置的自动启动和停止优先级为64和36,对应行：
+			# chkconfig: 2345 64 36
+
+	h,[小结]
+		实际程序包解压后，由于用户名的不同，仍需要修改数据目录有关的配置项的文件，并执行初始化的动作；
+
+
+三，安装JDK(绿色版)
+	1，复制jdk压缩包到$HOME目录，进入$HOME目录，解压文件到$HOME/czjcc/，并改目录名：
+		$ cd 
+		$ tar xvf jdk-7u71-linux-i586.tar.gz -C $HOME/czjcc/
+		$ mv $HOME/czjcc/jdk-7u71-linux-i586/ $HOME/czjcc/jdk/
+
+	2，修改本普通用户环境变量并生效：
+		$ vi $HOME/.bash_profile
+		自定义部分内容：
+		PATH =$PATH:$HOME
+		export JAVA_HOME=$HOME/czjcc/jdk/
+		export JRE_HOME=$JAVA_HOME/jre/
+		export PATH=$JAVA_HOME/bin:$PATH
+		生效:
+		$ source .bash_profile
+
+
+四，安装tomcat，并配置为系统服务和自启动
+	1，复制tomcat压缩包到$HOME目录，进入$HOME目录，解压文件到$HOME/czjcc/，并改目录名
+		$ cd
+		$ tar xvf apache-tomcat-7.0.68.tar.gz -C $HOME/czjcc/
+		$ mv $HOME/czjcc/apache-tomcat-7.0.68/  $HOME/czjcc/tomcat/
+
+	2，tomcat系统服务端口默认8080，linux禁止普通用户启动80端口服务，为实现外部访问80端口服务：
+		通过Iptables端口实现80到8080的转发，命令为：
+		# iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+	3，设置tomcat为普通用户运行，并设置为系统服务，设置为开机自定启动：
+		这部分仍要手动进行；
+
+五，解压应用.war文件
+	建立webapp文件存放的目录：
+	$ mkdir -p $HOME/czjcc/app/
+	解压文件
+	$ unzip -oq czjcc.war -d $HOME/czjcc/app/
+
+
+六，修改应用相关配置文件
+	1，修改tomcat的应用部署位置相关的配置：
+		$ vi $TOMCAT_HOME/conf/server.xml
+		添加应用webapp的文件夹位置配置，在<Host>标签内添加：
+		<Context path="" docBase="/home/merrick/czjcc/app" />
+	2，修改hibernate配置的有关数据库的用户名和密码(如不和数据库服务器在同一机器则连接url也要修改):
+
+	3，修改webapp的log4j配置文件的日志路径配置：
+
+	4，修改webapp的有关数据文件存放路径的属性文件配置：
+
+
+
+
+
+
+
+
+
+
+
 
