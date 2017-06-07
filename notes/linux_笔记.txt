@@ -251,8 +251,15 @@ unzip -d 指定目录
 		$ mv $HOME/czjcc/apache-tomcat-7.0.68/  $HOME/czjcc/tomcat/
 
 	2，tomcat系统服务端口默认8080，linux禁止普通用户启动80端口服务，为实现外部访问80端口服务：
-		通过Iptables端口实现80到8080的转发，命令为：
+		通过Iptables端口实现80到8080的转发，命令为(貌似重启后失效)：
 		# iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+		(为保证重启后有效，加入服务、自启动,redhat系列有效)：
+		# service iptables save
+		# chkconfig iptables on
+		查看状态：
+		# more /etc/sysconfig/iptables 或者 # iptables-save
+
+
 
 	3，设置tomcat为普通用户运行，并设置为系统服务，设置为开机自定启动：
 		这部分仍要手动进行；
