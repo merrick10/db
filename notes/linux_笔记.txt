@@ -256,8 +256,11 @@ unzip -d 指定目录
 		(为保证重启后有效，加入服务、自启动,redhat系列有效)：
 		# service iptables save
 		# chkconfig iptables on
+		(非redhat)
+		# iptables-save > /etc/sysconfig/iptables
 		查看状态：
 		# more /etc/sysconfig/iptables 或者 # iptables-save
+		
 
 
 
