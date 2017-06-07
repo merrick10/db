@@ -105,13 +105,19 @@ bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpco
 
 2，进入$TOMCAT_HOME/bin/commons-daemon-1.0.15-native-src/unix/ ，执行配置和编译
 	$ cd commons-daemon-1.0.15-native-src/unix/
- 	$ ./configure --with-java=/usr/local/java/
+ 	$ ./configure --with-java=$JAVA_HOME
  	$ make
+
+ 	注(ubuntu下安装gcc)：
+ 	1 apt-get install gcc 
+	2 apt-get install build-essential
 
 3，复制编译好的jsvc到“${CATALINA_BASE}/bin/” 目录下；
 
-4，修改$TOMCAT_HOME/bin/daemon.sh，添加JDK环境变量(虽然已设置JDK系统环境变量，这里还是要设置)：
+4，修改$TOMCAT_HOME/bin/daemon.sh，添加JDK环境变量(虽然已设置JDK系统环境变量，这里还是要设置)，修改用户：
 	JAVA_HOME=/home/merrick/czjcc/jdk
+	test ".$TOMCAT_USER" = . && TOMCAT_USER=merrick
+
 
 5，建立软链接到系统服务管理项:
 	# ln -s $TOMCAT_HOME/bin/daemon.sh /etc/init.d/tomcat
@@ -191,14 +197,24 @@ unzip -d 指定目录
 
 		对于mysql5.7的初始化，会在屏幕上显示随机产生的初始密码，比如：“A temporary password is generated for root@localhost: tlsfUT1Cse;h”
 
+		注意：如果出现mysql报错：error while loading shared libraries: libaio.so.1: cannot open shared object file: No such file or directory，则需要安装缺少的库文件：
+			Ubuntu下：
+			apt-get install libaio1 libaio-dev
+			Redhat/Fedora/CentOS:				
+			yum install libaio
+
+
 	c,[命令行启动]
 		(停止可以kill对应活动线程)
 		$ cd $HOME/czjcc/mysql/
-		$ bin/mysqld_safe -defaults-file=my.cnf &
+		$ bin/mysqld_safe --defaults-file=my.cnf &
 
 	d,[命令行访问mysql]：
 		(必需是当前用户，地址必需是127.0.0.1，不能是localhost，当前session)
 		$ bin/mysql -h127.0.0.1 -P13306 -uroot -pxxxxxx
+
+		[修改mysql初始root密码]：
+		alter user root@localhost identified by 'pswpsw';
 
 	e,[给app使用的用户需要添加并库授权(app在本地，和数据同一机器)]：
 		mysql> create user 'czjcc'@'localhost' identified by '123456';
@@ -216,7 +232,7 @@ unzip -d 指定目录
 			启动：# service mysql start
 			停止：# service mysql stop			
 
-		设置开机启动：
+		设置开机启动(适用CentOS，Ubuntu另行设置)：
 			# chkconfig --add mysql
 			# chkconfig --level 345 mysql on
 
@@ -258,10 +274,9 @@ unzip -d 指定目录
 		# chkconfig iptables on
 		(非redhat)
 		# iptables-save > /etc/sysconfig/iptables
+		# iptables-restore < /etc/sysconfig/iptablse
 		查看状态：
 		# more /etc/sysconfig/iptables 或者 # iptables-save
-		
-
 
 
 	3，设置tomcat为普通用户运行，并设置为系统服务，设置为开机自定启动：
@@ -279,11 +294,19 @@ unzip -d 指定目录
 		$ vi $TOMCAT_HOME/conf/server.xml
 		添加应用webapp的文件夹位置配置，在<Host>标签内添加：
 		<Context path="" docBase="/home/merrick/czjcc/app" />
-	2，修改hibernate配置的有关数据库的用户名和密码(如不和数据库服务器在同一机器则连接url也要修改):
+
+	2，修改hibernate配置的有关数据库的用户名、密码、端口(如不和数据库服务器在同一机器则连接url也要修改):
 
 	3，修改webapp的log4j配置文件的日志路径配置：
 
 	4，修改webapp的有关数据文件存放路径的属性文件配置：
+		emailattachsavefolder=/home/merrick/czjcc/userdata/articlepicfolder
+		vipcompicfolder=/home/merrick/czjcc/userdata/compicturefolder
+		articlepicfolder=/home/merrick/czjcc/userdata/emailattachfolder
+		mbfolder=/home/merrick/czjcc/userdata/mbfolder
+
+		注：
+			之前没加英文资源，server处理国际化资源时没找到会报错"Can't find bundle for base name resource, locale en_US"，故需要加一下应用的英文国际化资源文件.
 
 
 
