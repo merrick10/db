@@ -108,7 +108,7 @@ bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpco
  	$ ./configure --with-java=$JAVA_HOME
  	$ make
 
- 	注(ubuntu下安装gcc)：
+ 	注(ubuntu下安装gcc/g++)：
  	1 apt-get install gcc 
 	2 apt-get install build-essential
 
@@ -175,7 +175,7 @@ unzip -d 指定目录
 	$ tar xvf mysql-5.7.14-linux-glibc2.5-i686.tar.gz -C $HOME/czjcc/
 	$ mv $HOME/czjcc/mysql-5.7.14-linux-glibc2.5-i686/ $HOME/czjcc/mysql/
 
-2，建立my.cnf文件($HOME/czjcc/mysql/my.cnf)(均为绝对路径,merrick为安装用户)，内容如下：
+2，建立my.cnf文件($HOME/czjcc/mysql/my.cnf)(均为绝对路径,merrick为安装用户)，内容如下：(**打包后也要做的步骤，脚本中需要替换实际内容)
 	[mysqld]
 	basedir =/home/merrick/czjcc/mysql/
 	datadir =/home/merrick/czjcc/mysql/data/
@@ -225,7 +225,7 @@ unzip -d 指定目录
 		$ bin/mysql -h127.0.0.1 -P13306 -uroot -p123456 < /home/merrick/czjcc/scripts/jpcorps_1_win32.sql
 
 	g,[配置为系统服务，并设定为开机启动]：
-		复制配置文件和系统服务启停脚本：
+		复制配置文件和系统服务启停脚本：(**打包后，自动脚本也要做的步骤)
 		# cp /home/merrick/czjcc/mysql/my.cnf /etc/my.cnf
 		# cp /home/merrick/czjcc/mysql/support-files/mysql.server /etc/init.d/mysql
 		这样就可以用命令启停mysql：
@@ -249,7 +249,7 @@ unzip -d 指定目录
 		$ tar xvf jdk-7u71-linux-i586.tar.gz -C $HOME/czjcc/
 		$ mv $HOME/czjcc/jdk-7u71-linux-i586/ $HOME/czjcc/jdk/
 
-	2，修改本普通用户环境变量并生效：
+	2，修改本普通用户环境变量并生效：(**打包后，自动脚本也要做的步骤)
 		$ vi $HOME/.bash_profile
 		自定义部分内容：
 		PATH =$PATH:$HOME
@@ -279,7 +279,7 @@ unzip -d 指定目录
 		# more /etc/sysconfig/iptables 或者 # iptables-save
 
 
-	3，设置tomcat为普通用户运行，并设置为系统服务，设置为开机自定启动：
+	3，设置tomcat为普通用户运行，并设置为系统服务：(**打包后，自动脚本也要做的步骤)
 		这部分仍要手动进行；
 		$ cd $HOME/czjcc/tomcat/bin/
 		$ tar xf ./commons-daemon-native.tar.gz
@@ -300,14 +300,14 @@ unzip -d 指定目录
 		$ service tomcat stop
 
 
-五，解压应用.war文件
+五，解压应用.war文件(**打包后，自动脚本也要做的步骤)
 	建立webapp文件存放的目录：
 	$ mkdir -p $HOME/czjcc/app/
 	解压文件
 	$ unzip -oq czjcc.war -d $HOME/czjcc/app/
 
 
-六，修改应用相关配置文件
+六，修改应用相关配置文件(**打包后，自动脚本也要做的步骤)
 	1，修改tomcat的应用部署位置相关的配置：
 		$ vi $TOMCAT_HOME/conf/server.xml
 		添加应用webapp的文件夹位置配置，在<Host>标签内添加：
@@ -361,6 +361,53 @@ unzip -d 指定目录
 		groupadd grp1
 	4，添加用户
 		# useradd -d /home/test1 -g grp1 -p zIdlcW4dSg41s -m -s /bin/bash test1
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+	[ubuntu的初始root密码设置]
+	1，ubuntu安装过程没有设置root密码，仅设置了一个非root用户密码；
+	2，登录安装过程设置了密码的用户，然后使用sudo passwd修改密码，要求先验证当前用户;重复正确输入新密码后提示更新成功
+		$ sudo passwd
+		[sudo] password for xxxx:
+		Enter new UNIX password:
+		Retype new UNIX password:
+		passwd：password updated successfully
+-------------------------------------------------------------------------------------------------------------------------------------------
+	[ubuntu ssh开放远程root登录]
+	1，修改配置开启远程登录：
+		# vi /etc/ssh/sshd_config
+		注释掉一行配置： #PermitRootLogin without-password
+		添加一行配置：PermitRootLogin yes
+
+	2，重启ssh服务
+		# service ssh restart
+-----------------------------------------------------------------------------------------------------------------------------------------------
+	[ubuntu下设置开机启动自定义服务]
+
+	(貌似只能以root用户启动，对于这种特定用户运行，有问题，无法自启动成功；对于安装时使用了HOME加密，这种方法无效)
+	建立自启动，启动顺序为98，运行级别2、3、4、5，服务名mysql：
+	$ sudo update-rc.d mysql start 98 2 3 4 5 .
+	update-rc.d: warning:  stop runlevel arguments (none) do not match mysql Default-Stop values (0 1 6)
+	 Adding system startup for /etc/init.d/mysql ...
+	   /etc/rc2.d/S98mysql -> ../init.d/mysql
+	   /etc/rc3.d/S98mysql -> ../init.d/mysql
+	   /etc/rc4.d/S98mysql -> ../init.d/mysql
+	   /etc/rc5.d/S98mysql -> ../init.d/mysql
+
+	删除该自启动：
+	$ sudo update-rc.d -f mysql remove
+
+	[在/etc/rc.local中设置开机启动脚本]
+	/etc/rc.local中的命令是系统启动最后执行的动作，其中在"exit 0"前面的脚本内容如下(切换用户并执行)
+		su - merrick <<EOF
+		service mysql start;		
+		pwd;
+		id;
+		exit;
+	或者，仅执行一条命令时：
+		su - merrick -c "service mysql start"
+
+
+
 
 
 
