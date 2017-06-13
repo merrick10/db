@@ -280,12 +280,18 @@ unzip -d 指定目录
 
 
 	3，设置tomcat为普通用户运行，并设置为系统服务：(**打包后，自动脚本也要做的步骤)
-		这部分仍要手动进行；
+		生成守护程序jsvc，这部分仍要手动进行；
 		$ cd $HOME/czjcc/tomcat/bin/
 		$ tar xf ./commons-daemon-native.tar.gz
 		$ cd commons-daemon-1.0.15-native-src/unix/
 		$ ./configure
 		$ make
+
+		注意：此处如果没有安装gcc、g++编译器，需要先安装gcc：
+		$ sudo apt-get install gcc
+		$ sudo apt-get install build-essential
+
+		复制服务守护程序jsvc至tomcat的bin目录：
 		$ cp ./jsvc $HOME/czjcc/tomcat/bin/
 		$ vi $TOMCAT_HOME/bin/daemon.sh
 		在此脚本中设置TOMCAT_USER和JAVA_HOME环境变量保存：
@@ -336,7 +342,11 @@ unzip -d 指定目录
 
 	[注意]
 	1，my.cnf中的basedir之类一系列参数只能配置绝对路径，而不能引用环境变量、不能使用相对路径；
-	2，mysql经初始化建立系统库后，把所有文件转义至其他路径，修改 $MYSQL_HOME/my.cnf下的有关路径参数配置后，可以启动成功；
+	2，mysql经初始化建立系统库后，把所有文件转移至其他路径，修改 $MYSQL_HOME/my.cnf下的有关路径参数配置后，可以启动成功(不再需要再次初始化)；
+
+七，设置mysql和tomcat自启动：
+	1，CentOS和redhat前面已提及，采用chkconfig工具；
+	2，Ubuntu则采用编辑/etc/rc.local加入shell脚本来实现：以普通用户启动的系统服务。
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 常用命令：
@@ -363,7 +373,7 @@ unzip -d 指定目录
 		# useradd -d /home/test1 -g grp1 -p zIdlcW4dSg41s -m -s /bin/bash test1
 
 -----------------------------------------------------------------------------------------------------------------------------------------
-	[ubuntu的初始root密码设置]
+[ubuntu的初始root密码设置]
 	1，ubuntu安装过程没有设置root密码，仅设置了一个非root用户密码；
 	2，登录安装过程设置了密码的用户，然后使用sudo passwd修改密码，要求先验证当前用户;重复正确输入新密码后提示更新成功
 		$ sudo passwd
@@ -372,7 +382,7 @@ unzip -d 指定目录
 		Retype new UNIX password:
 		passwd：password updated successfully
 -------------------------------------------------------------------------------------------------------------------------------------------
-	[ubuntu ssh开放远程root登录]
+[ubuntu ssh开放远程root登录]
 	1，修改配置开启远程登录：
 		# vi /etc/ssh/sshd_config
 		注释掉一行配置： #PermitRootLogin without-password
@@ -381,8 +391,7 @@ unzip -d 指定目录
 	2，重启ssh服务
 		# service ssh restart
 -----------------------------------------------------------------------------------------------------------------------------------------------
-	[ubuntu下设置开机启动自定义服务]
-
+[ubuntu下设置开机启动自定义服务]
 	(貌似只能以root用户启动，对于这种特定用户运行，有问题，无法自启动成功；对于安装时使用了HOME加密，这种方法无效)
 	建立自启动，启动顺序为98，运行级别2、3、4、5，服务名mysql：
 	$ sudo update-rc.d mysql start 98 2 3 4 5 .
@@ -396,15 +405,46 @@ unzip -d 指定目录
 	删除该自启动：
 	$ sudo update-rc.d -f mysql remove
 
-	[在/etc/rc.local中设置开机启动脚本]
+[在/etc/rc.local中设置开机启动脚本]	-----------------[OK]
 	/etc/rc.local中的命令是系统启动最后执行的动作，其中在"exit 0"前面的脚本内容如下(切换用户并执行)
 		su - merrick <<EOF
 		service mysql start;		
 		pwd;
+		service tomcat start;
 		id;
 		exit;
 	或者，仅执行一条命令时：
 		su - merrick -c "service mysql start"
+
+----------------------------------------------------------------------------------------------------------------
+[vim操作快捷键]		
+	单文件正文搜索，： /xxx
+	单文件全文搜索替换，提示是否替换：    :%s/oldstring/newstring/gc
+	撤销上一次编辑： ctrl + u
+
+
+----------------------------------------------------------------------------------------------------------------------
+[使用openssl加密和解密tar包]
+	加密：	
+	$ tar -czf - ./test1/ | openssl enc -e -aes256 -out secured1.tar.gz
+	enter aes-256-cbc encryption password:
+	Verifying - enter aes-256-cbc encryption password:
+	[命令解释]
+	enc : 用openssl命令使用加密进行编码；
+	e： 用于加密输入文件的enc命令的选项，这里指前一个tar命令的输出；
+	aes256：加密的算法
+	out：指定输出的文件名；
+
+
+	解密
+	$ openssl enc -d -aes256 -in secured1.tar.gz | tar xz -C ./
+	enter aes-256-cbc decryption password:
+	[命令解释]
+	d：用于解密文件；
+
+	详细可参考：$ man openssl
+----------------------------------------------------------------------------------------------------------------
+
 
 
 
