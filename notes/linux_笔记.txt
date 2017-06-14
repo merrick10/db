@@ -445,6 +445,44 @@ unzip -d 指定目录
 	详细可参考：$ man openssl
 ----------------------------------------------------------------------------------------------------------------
 
+[ubuntu下用nginx作反向代理，转发80端口请求至8080端口]：
+	安装nginx配作reverse proxy，解决非root用户运行tomcat不能开启80端口的问题：
+	1，安装nginx：
+		由于可以联网(虚拟机下通过NAT也能访问外网)，ubuntu下使用apt-get安装:
+		$ sudo apt-get install nginx
+		# nginx -v
+		# nginx version: nginx/1.4.6 (Ubuntu)
+	2，进入/etc/nginx，编辑主配置文件nginx.conf:
+		因为这个版本nginx貌似采用了次级配置文件被主配置文件include的方式，但是要配置的没那么多，所以先把默认的配置先屏蔽掉，直接在主配置文件中进行：
+		# vi /etc/nginx/nginx.conf
+		这两行屏蔽：
+		#       include /etc/nginx/conf.d/*.conf;
+		#       include /etc/nginx/sites-enabled/*;
+		在http{}下配置，：		
+        server{
+                listen 80;
+                location / {
+                		#发向80端口的请求将被转发至这个地址
+                        proxy_pass http://192.168.245.134:8080/;
+
+                        #Host头域指定请求资源的Intenet主机和端口号。这里可选，这样配置后用户浏览器中不会显示端口
+                        proxy_set_header Host $host;
+                        #后端web服务器可根据头域X-Forwarded-For获取请求用户的真实IP
+                        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                }
+        }
+    3，保存配置后启停：
+    	启动：# nginx
+    	指定配置文件启动：# nginx -c /etc/nginx/nginx.conf
+    	停止：# nginx -s stop
+    	重启：# nginx -s reload
+    	检查配置：# nginx -t 
+    	平缓停止：# nginx -s quit
+----------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 
