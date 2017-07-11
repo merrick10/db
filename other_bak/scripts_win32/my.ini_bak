@@ -48,5 +48,5 @@ max_allowed_packet=100M
 max_connections=500
 skip-symbolic-links
 disable-local-infile=1
-bind-address = 0.0.0.0
+bind-address = 127.0.0.1
 sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES 

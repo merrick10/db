@@ -1,0 +1,18 @@
+[查看配置]：git config --list
+
+[删除配置]：git config --global --unset 配置项
+
+[配置某项]：git config --levelname --add configName configValue
+	注：levelname是诸如global或者local;configName比如http.proxy,configValue比如
+
+[查看远程地址配置]：git remote -v
+
+[加入本地修改]：git add .
+
+[提交至远程仓库]：git push origin master
+	注：提交至master分支；地址别名为origin；
+
+[获取远程内容并合并至本地]：git pull origin master
+
+[克隆远程地址的仓库至本地]：git clone xxx.git
+	注：xxx.git为url；默认当前目录；
