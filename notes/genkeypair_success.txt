@@ -1,0 +1,21 @@
+
+keytool -genkey -alias merrickclientprivate -keypass liumiao -keystore client_keystore.jks -storepass liumiao -dname "CN=merrick.site" -keyalg RSA
+
+keytool -selfcert -keystore client_keystore.jks -alias merrickclientprivate -storepass liumiao -keypass liumiao
+
+keytool -export -alias merrickclientprivate -file client_pubcert.cer -keystore client_keystore.jks -storepass liumiao
+
+
+keytool -genkey -alias merrickserverprivate -keypass liumiao -keystore server_keystore.jks -storepass liumiao -dname "CN=merrick.site" -keyalg RSA
+
+keytool -selfcert -keystore server_keystore.jks -alias merrickserverprivate -storepass liumiao -keypass liumiao
+
+keytool -export -alias merrickserverprivate -file server_pubcert.cer -keystore server_keystore.jks -storepass liumiao
+
+
+keytool -import -alias merrickclientpublic -file client_pubcert.cer -keystore server_trust.jks -storepass liumiao
+
+keytool -import -alias merrickserverpublic -file server_pubcert.cer -keystore client_trust.jks -storepass liumiao
+
+
+------------for tls comm
