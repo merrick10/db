@@ -70,7 +70,7 @@
     -->
     <Connector port="80" protocol="HTTP/1.1"
                connectionTimeout="20000"  address="0.0.0.0"
-               redirectPort="443"  />
+               redirectPort="443"   server=" " />
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
